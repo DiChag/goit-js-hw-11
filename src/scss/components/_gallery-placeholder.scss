@@ -1,0 +1,17 @@
+.gallery__placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  font-size: 18px;
+  font-weight: 400;
+
+  pointer-events: none;
+
+  transform: translate(-50%, -50%);
+
+  // &.is-hidden {
+  //   opacity: 0;
+  //   visibility: hidden;
+  // }
+}

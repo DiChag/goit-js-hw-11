@@ -5,19 +5,49 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Homework 11</title>
+    <link rel="stylesheet" href="./scss/main.css" />
   </head>
   <body>
-    <form class="search-form" id="search-form">
-      <input
-        type="text"
-        name="searchQuery"
-        autocomplete="off"
-        placeholder="Search images..."
-      />
-      <button type="submit">Search</button>
-    </form>
-    <div class="gallery"></div>
-    <button type="button" class="load-more is-hidden">Load more</button>
+    <header class="header">
+      <form class="search-form" id="search-form">
+        <div class="input-group">
+          <label>
+            <input
+              type="text"
+              name="searchQuery"
+              autocomplete="off"
+              placeholder="What do you want to see..."
+            />
+          </label>
+          <button class="unit" type="button">
+            <i class="icon ion-md-search"></i>I
+          </button>
+        </div>
+      </form>
+    </header>
+    <main class="main">
+      <section class="gallery">
+        <div class="gallery__container">
+          <h1 class="gallery__placeholder is-hidden" data-gallery="placeholder">
+            Let's find some images...
+          </h1>
+          <!-- Карточки изображений -->
+        </div>
+
+        <!-- Клик и вверх -->
+        <!-- <button
+          class="scroll-to-top is-hidden"
+          id="scroll-to-top"
+          type="button"
+          aria-label="Scroll to top"
+        >
+          Up
+        </button> -->
+      </section>
+
+      <!-- Покажи больше фото -->
+      <button type="button" class="load-more is-hidden">Load more</button>
+    </main>
     <script src="./index.js" type="module"></script>
   </body>
 </html>
