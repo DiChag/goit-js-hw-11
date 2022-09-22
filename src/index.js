@@ -4,117 +4,101 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import ImgApiService from './img-service';
-import LoadMoreBtn from './load-more-btn';
 
-const imgApiService = new ImgApiService();
 const refs = {
-  formEl: document.querySelector('#search-form'),
-  galleryContainer: document.querySelector('.gallery'),
+  searchForm: document.querySelector('#search-form'),
+  divEl: document.querySelector('.gallery'),
+  loadMoreBtn: document.querySelector('.load-more'),
 };
 
-const { height: pageHeaderHeight } = document
-  .querySelector('.search-form')
-  .getBoundingClientRect();
-document.body.style.paddingTop = `${pageHeaderHeight + 5}px`;
+let isShown = 0;
 
-const loadMoreBtn = new LoadMoreBtn({ selector: '.load-more', hidden: true });
+const GalleryEl = new ImgApiService();
+refs.searchForm.addEventListener('submit', onFormSubmit);
+refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
-refs.formEl.addEventListener('submit', onSearchRequest);
-loadMoreBtn.refs.button.addEventListener('click', onLoadMore);
+async function onFormSubmit(e) {
+  e.preventDefault();
 
-function onSearchRequest(evt) {
-  evt.preventDefault();
-
-  imgApiService.query = evt.currentTarget.elements.searchQuery.value;
-  refs.galleryContainer.innerHTML = '';
-  loadMoreBtn.hide();
-  if (!imgApiService.query.trim()) {
-    Notiflix.Notify.failure(
-      'Sorry, you have to enter query string. Please try again.'
-    );
-    return;
-  }
-
-  loadMoreBtn.show();
-  loadMoreBtn.disable();
-  imgApiService.resetPage();
-  imgApiService.fetchImg().then(images => {
-    if (images.totalHits === 0) {
-      loadMoreBtn.hide();
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-      return;
-    }
-    Notiflix.Notify.info(`Hooray! We found ${images.totalHits} images.`);
-    appendImgMarkup(images.hits);
-    simpleLigthbox.refresh();
-    loadMoreBtn.enable();
-  });
+  GalleryEl.query = e.target.elements.searchQuery.value.trim();
+  isShown = 0;
+  refs.divEl.innerHTML = '';
+  GalleryEl.resetPage();
+  fetchGallery();
 }
 
 function onLoadMore() {
-  loadMoreBtn.disable();
-  imgApiService.fetchImg().then(images => {
-    appendImgMarkup(images.hits);
-    simpleLigthbox.refresh();
-    loadMoreBtn.enable();
-    if ((imgApiService.page - 1) * imgApiService.per_page > images.totalHits) {
-      loadMoreBtn.hide();
-      Notiflix.Notify.info(
-        `We're sorry, but you've reached the end of search results.`
-      );
-    }
-    const { height: cardHeight } = document
-      .querySelector('.gallery')
-      .firstElementChild.getBoundingClientRect();
-
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
-  });
+  GalleryEl.incrementPage();
+  fetchGallery();
 }
 
-function appendImgMarkup(images = []) {
-  const imgMarkup = images
-    .map(image => {
-      return `
-      
-      <a class="gallery__item" href="${image.largeImageURL}">
-        <div class="photo-card">
-          <img class="gallery__image" src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />  
-          <div class="info">
-            <p class="info-item">
-              <b class="info-name">Likes</b>
-              <span class="info-number">${image.likes}</span>
-            </p>
-            <p class="info-item">
-              <b class="info-name">Views</b>
-              <span class="info-number">${image.views}</span>
-            </p>
-            <p class="info-item">
-              <b class="info-name">Comments</b>
-              <span class="info-number">${image.comments}</span>
-            </p>
-            <p class="info-item">
-              <b class="info-name">Downloads</b>
-              <span class="info-number">${image.downloads}</span>
-            </p>
-          </div>
-          </div>
-          </a>
-      `;
-    })
+async function fetchGallery() {
+  refs.loadMoreBtn.classList.add('is-hidden');
+
+  const response = await GalleryEl.fetchGallery();
+  const { hits, total } = response;
+
+  if (!hits.length) {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
+
+  renderGallery(hits);
+
+  isShown += hits.length;
+
+  if (isShown < total) {
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  }
+  if (isShown >= total) {
+    Notiflix.Notify.info(
+      'We re sorry, but you have reached the end of search results.'
+    );
+  }
+}
+
+function renderGallery(elements) {
+  console.log(elements);
+  const markup = elements
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `
+          <a class="card" href="${largeImageURL}">
+                <div class="card__container">
+                    <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+                    <div class="card__info">
+                        <p class="card__info-item">
+                            <b>Likes</b>
+                            ${likes}
+                        </p>
+                        <p class="card__info-item">
+                            <b>Views</b>
+                            ${views}
+                        </p>
+                        <p class="card__info-item">
+                            <b>Comments</b>
+                            ${comments}
+                        </p>
+                        <p class="card__info-item">
+                            <b>Downloads</b>
+                            ${downloads}
+                        </p>
+                    </div>
+                </div>
+            </a>`;
+      }
+    )
     .join('');
-  refs.galleryContainer.insertAdjacentHTML('beforeend', imgMarkup);
-}
 
-const simpleLigthbox = new SimpleLightbox('.gallery a', {
-  nav: true,
-  close: true,
-  caption: true,
-  captionsData: 'alt',
-  captionPosition: 'bottom',
-  captionDelay: 250,
-});
+  refs.divEl.insertAdjacentHTML('beforeend', markup);
+  const simpleLightbox = new SimpleLightbox('.gallery a');
+}

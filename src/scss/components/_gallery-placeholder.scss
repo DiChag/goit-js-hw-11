@@ -1,21 +1,3 @@
-.gallery__placeholder {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-
-  font-size: 18px;
-  font-weight: 400;
-
-  pointer-events: none;
-
-  transform: translate(-50%, -50%);
-
-  // &.is-hidden {
-  //   opacity: 0;
-  //   visibility: hidden;
-  // }
-}
-
 .gallery {
   display: grid;
   max-width: 1200px;
@@ -26,4 +8,62 @@
   margin-right: auto;
   margin-bottom: 10px;
   padding: 0 15px 10px 15px;
+}
+
+.card__container {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+
+  border-radius: 12px;
+  overflow: hidden;
+
+  // background-color: $card-bg-color;
+
+  box-shadow: -5px -5px 20px $color-white, 5px 5px 20px $color-shadow;
+
+  transition: all 0.2s ease-in-out;
+
+  .card:hover &,
+  .card:focus & {
+    box-shadow: -2px -2px 5px $color-white, 2px 2px 5px $color-shadow;
+  }
+}
+
+.card__info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  border-top: 1px solid #e5e5e5;
+}
+
+.card__info-item {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  margin: 0;
+  padding-top: 8px;
+  padding-bottom: 5px;
+
+  &:not(:last-child)::after {
+    content: '';
+
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    border-right: 1px solid #e5e5e5;
+  }
 }
