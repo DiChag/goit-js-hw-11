@@ -26,8 +26,8 @@
       </form>
     </header>
     <main class="main">
-      <section class="gallery">
-        <div class="gallery__container">
+      <section>
+        <div class="gallery">
           <h1 class="gallery__placeholder is-hidden" data-gallery="placeholder">
             Let's find some images...
           </h1>
@@ -46,7 +46,15 @@
       </section>
 
       <!-- Покажи больше фото -->
-      <button type="button" class="load-more is-hidden">Load more</button>
+      <!-- <button type="button" class="load-more is-hidden">Load more</button> -->
+      <button class="load-more btn btn-primary" type="button">
+        <span
+          class="spinner-border spinner-border-sm spinner is-hidden"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        <span class="label sr-only">Load more</span>
+      </button>
     </main>
     <script src="./index.js" type="module"></script>
   </body>

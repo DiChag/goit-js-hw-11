@@ -1,101 +1,120 @@
+import './scss/main.css';
 import Notiflix from 'notiflix';
-import NewsApiImageService from './searchImage';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import './scss/main.css';
 
-const formEl = document.querySelector('#search-form');
-const divEl = document.querySelector('.gallery');
-const loadMoreBtn = document.querySelector('.load-more');
+import ImgApiService from './img-service';
+import LoadMoreBtn from './load-more-btn';
 
-let isShown = 0;
+const imgApiService = new ImgApiService();
+const refs = {
+  formEl: document.querySelector('#search-form'),
+  galleryContainer: document.querySelector('.gallery'),
+};
 
-const ImageEl = new NewsApiImageService();
+const { height: pageHeaderHeight } = document
+  .querySelector('.search-form')
+  .getBoundingClientRect();
+document.body.style.paddingTop = `${pageHeaderHeight + 5}px`;
 
-formEl.addEventListener('submit', onFormSubmit);
-loadMoreBtn.addEventListener('click', onLoadMore);
+const loadMoreBtn = new LoadMoreBtn({ selector: '.load-more', hidden: true });
 
-async function onFormSubmit(e) {
-  e.preventDefault();
-  isShown = 0;
-  divEl.innerHTML = '';
-  ImageEl.resetPage();
-  ImageEl.query = e.target.elements.searchQuery.value.trim();
-  fetchImages();
+refs.formEl.addEventListener('submit', onSearchRequest);
+loadMoreBtn.refs.button.addEventListener('click', onLoadMore);
+
+function onSearchRequest(evt) {
+  evt.preventDefault();
+
+  imgApiService.query = evt.currentTarget.elements.searchQuery.value;
+  refs.galleryContainer.innerHTML = '';
+  loadMoreBtn.hide();
+  if (!imgApiService.query.trim()) {
+    Notiflix.Notify.failure(
+      'Sorry, you have to enter query string. Please try again.'
+    );
+    return;
+  }
+
+  loadMoreBtn.show();
+  loadMoreBtn.disable();
+  imgApiService.resetPage();
+  imgApiService.fetchImg().then(images => {
+    if (images.totalHits === 0) {
+      loadMoreBtn.hide();
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      return;
+    }
+    Notiflix.Notify.info(`Hooray! We found ${images.totalHits} images.`);
+    appendImgMarkup(images.hits);
+    simpleLigthbox.refresh();
+    loadMoreBtn.enable();
+  });
 }
 
 function onLoadMore() {
-  ImageEl.incrementPage();
-  fetchImages();
+  loadMoreBtn.disable();
+  imgApiService.fetchImg().then(images => {
+    appendImgMarkup(images.hits);
+    simpleLigthbox.refresh();
+    loadMoreBtn.enable();
+    if ((imgApiService.page - 1) * imgApiService.per_page > images.totalHits) {
+      loadMoreBtn.hide();
+      Notiflix.Notify.info(
+        `We're sorry, but you've reached the end of search results.`
+      );
+    }
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  });
 }
 
-async function fetchImages() {
-  loadMoreBtn.classList.add('is-hidden');
-
-  const response = await ImageEl.fetchImage();
-  const { hits, total } = response;
-
-  if (!hits.length) {
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-  }
-
-  renderGallery(hits);
-
-  isShown += hits.length;
-
-  if (isShown < total) {
-    loadMoreBtn.classList.remove('is-hidden');
-  }
-  if (isShown >= total) {
-    Notiflix.Notify.info(
-      `We are sorry, but you have reached the end of search results.`
-    );
-  }
-}
-
-function renderGallery(elements) {
-  const markup = elements
-    .map(
-      ({
-        webformatURL,
-        largeImageURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => {
-        return `
-            <a class="gallery__link" href="${largeImageURL}">
-                <div class="photo-card">
-                    <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-                    <div class="info">
-                        <p class="info-item">
-                            <b>Likes</b>
-                            ${likes}
-                        </p>
-                        <p class="info-item">
-                            <b>Views</b>
-                            ${views}
-                        </p>
-                        <p class="info-item">
-                            <b>Comments</b>
-                            ${comments}
-                        </p>
-                        <p class="info-item">
-                            <b>Downloads</b>
-                            ${downloads}
-                        </p>
-                    </div>
-                </div>
-            </a>
-        `;
-      }
-    )
+function appendImgMarkup(images = []) {
+  const imgMarkup = images
+    .map(image => {
+      return `
+      
+      <a class="gallery__item" href="${image.largeImageURL}">
+        <div class="photo-card">
+          <img class="gallery__image" src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />  
+          <div class="info">
+            <p class="info-item">
+              <b class="info-name">Likes</b>
+              <span class="info-number">${image.likes}</span>
+            </p>
+            <p class="info-item">
+              <b class="info-name">Views</b>
+              <span class="info-number">${image.views}</span>
+            </p>
+            <p class="info-item">
+              <b class="info-name">Comments</b>
+              <span class="info-number">${image.comments}</span>
+            </p>
+            <p class="info-item">
+              <b class="info-name">Downloads</b>
+              <span class="info-number">${image.downloads}</span>
+            </p>
+          </div>
+          </div>
+          </a>
+      `;
+    })
     .join('');
-
-  divEl.insertAdjacentHTML('beforeend', markup);
-  const simpleLightBox = new SimpleLightbox('.gallery a');
+  refs.galleryContainer.insertAdjacentHTML('beforeend', imgMarkup);
 }
+
+const simpleLigthbox = new SimpleLightbox('.gallery a', {
+  nav: true,
+  close: true,
+  caption: true,
+  captionsData: 'alt',
+  captionPosition: 'bottom',
+  captionDelay: 250,
+});
