@@ -78,19 +78,19 @@ function renderGallery(elements) {
                     <div class="card__info">
                         <p class="card__info-item">
                             <b>Likes</b>
-                            ${likes}
+                             <span class="card__item-count">${likes}</span>
                         </p>
                         <p class="card__info-item">
                             <b>Views</b>
-                            ${views}
+                             <span class="card__item-count">${views}</span>
                         </p>
                         <p class="card__info-item">
                             <b>Comments</b>
-                            ${comments}
+                             <span class="card__item-count">${comments}</span>
                         </p>
                         <p class="card__info-item">
                             <b>Downloads</b>
-                            ${downloads}
+                             <span class="card__item-count">${downloads}</span>
                         </p>
                     </div>
                 </div>
