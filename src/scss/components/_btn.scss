@@ -3,7 +3,7 @@
   outline: 0;
   font-size: $ruler;
   border-radius: $ruler * 20;
-  padding: $ruler;
+  // padding: $ruler;
   background-color: $color-bg;
   text-shadow: 1px 1px 0 $color-white;
 
@@ -24,10 +24,6 @@
       inset -1px -1px 2px $color-white;
   }
 
-  .icon {
-    margin-right: $ruler/2;
-  }
-
   &.unit {
     border-radius: $ruler/2;
     line-height: 0;
@@ -38,10 +34,6 @@
     align-items: center;
     margin: 0 $ruler/2;
     font-size: $ruler * 1.2;
-
-    .icon {
-      margin-right: 0;
-    }
   }
 }
 
@@ -50,4 +42,5 @@
 .load-more {
   display: flex;
   margin: 10px auto;
+  padding: $ruler;
 }

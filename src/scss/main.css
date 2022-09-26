@@ -24,6 +24,9 @@ ul {
 img {
   display: block;
   max-width: 100%;
+  height: 160px;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 button {
@@ -48,7 +51,7 @@ a {
   overflow: hidden;
 }
 
-.header {
+header.header {
   position: fixed;
   top: 0;
   left: 0;
@@ -111,12 +114,15 @@ input:focus {
           flex: 1;
 }
 
+.search-icon {
+  fill: currentColor;
+}
+
 .btn {
   border: 0;
   outline: 0;
   font-size: 16px;
   border-radius: 320px;
-  padding: 16px;
   background-color: #ebecf0;
   text-shadow: 1px 1px 0 #fff;
   letter-spacing: -0.2px;
@@ -139,10 +145,6 @@ input:focus {
           box-shadow: inset 1px 1px 2px #babecc, inset -1px -1px 2px #fff;
 }
 
-.btn .icon {
-  margin-right: 8px;
-}
-
 .btn.unit {
   border-radius: 8px;
   line-height: 0;
@@ -161,15 +163,12 @@ input:focus {
   font-size: 19.2px;
 }
 
-.btn.unit .icon {
-  margin-right: 0;
-}
-
 .load-more {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   margin: 10px auto;
+  padding: 16px;
 }
 
 main {

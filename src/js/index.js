@@ -20,6 +20,10 @@ refs.loadMoreBtn.addEventListener('click', onLoadMore);
 async function onFormSubmit(e) {
   e.preventDefault();
 
+  if (e.currentTarget.elements.searchQuery.value === '') {
+    return (innerHTML = '');
+  }
+
   GalleryEl.query = e.target.elements.searchQuery.value.trim();
   isShown = 0;
   refs.divEl.innerHTML = '';
@@ -59,7 +63,6 @@ async function fetchGallery() {
 }
 
 function renderGallery(elements) {
-  console.log(elements);
   const markup = elements
     .map(
       ({

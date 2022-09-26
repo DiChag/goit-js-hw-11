@@ -20,7 +20,9 @@
             />
           </label>
           <button class="btn unit" type="submit">
-            <i class="icon ion-md-search"></i>Q
+            <svg class="search-icon" width="26" height="28">
+              <use href="./image/search.svg#search-icon"></use>
+            </svg>
           </button>
         </div>
       </form>
@@ -28,11 +30,12 @@
     <!-- Main -->
     <main>
       <section>
-        <div class="gallery" data-aos="zoom-out-up"></div>
+        <div class="gallery"></div>
       </section>
 
       <button type="button" class="btn load-more is-hidden">Load more</button>
     </main>
+
     <script src="./js/index.js" type="module"></script>
   </body>
 </html>
